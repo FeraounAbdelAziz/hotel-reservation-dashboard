@@ -64,13 +64,13 @@ function AdminDashboard() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-900 text-green-200';
       case 'in_progress':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-900 text-blue-200';
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-900 text-yellow-200';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-700 text-gray-200';
     }
   };
 
@@ -78,28 +78,28 @@ function AdminDashboard() {
     <div className="container mx-auto p-4 space-y-4">
       <h1 className="text-2xl font-bold">Admin Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
+        <Card className="bg-gray-800 border-gray-700">
           <CardHeader>
-            <CardTitle>Users</CardTitle>
+            <CardTitle className="text-gray-200">Users</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{users?.length || 0}</p>
+            <p className="text-2xl font-bold text-gray-200">{users?.length || 0}</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-gray-800 border-gray-700">
           <CardHeader>
-            <CardTitle>Tasks</CardTitle>
+            <CardTitle className="text-gray-200">Tasks</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{tasks?.length || 0}</p>
+            <p className="text-2xl font-bold text-gray-200">{tasks?.length || 0}</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-gray-800 border-gray-700">
           <CardHeader>
-            <CardTitle>Stock Items</CardTitle>
+            <CardTitle className="text-gray-200">Stock Items</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{stock?.length || 0}</p>
+            <p className="text-2xl font-bold text-gray-200">{stock?.length || 0}</p>
           </CardContent>
         </Card>
       </div>
@@ -108,7 +108,7 @@ function AdminDashboard() {
           {stats.map((stat) => (
             <div
               key={stat.name}
-              className="bg-white overflow-hidden shadow rounded-lg"
+              className="bg-gray-800 overflow-hidden shadow rounded-lg border border-gray-700"
             >
               <div className="p-5">
                 <div className="flex items-center">
@@ -117,10 +117,10 @@ function AdminDashboard() {
                   </div>
                   <div className="ml-5 w-0 flex-1">
                     <dl>
-                      <dt className="text-sm font-medium text-primary-500 truncate">
+                      <dt className="text-sm font-medium text-gray-300 truncate">
                         {stat.name}
                       </dt>
-                      <dd className="text-lg font-semibold text-primary-500">
+                      <dd className="text-lg font-semibold text-gray-200">
                         {stat.value}
                       </dd>
                     </dl>
@@ -131,35 +131,35 @@ function AdminDashboard() {
           ))}
         </div>
 
-        <div className="bg-white shadow sm:rounded-lg">
+        <div className="bg-gray-800 shadow sm:rounded-lg border border-gray-700">
           <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg font-medium leading-6 text-primary-500 mb-4">
+            <h3 className="text-lg font-medium leading-6 text-gray-200 mb-4">
               Recent Tasks
             </h3>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-primary-200">
-                <thead className="bg-primary-50">
+              <table className="min-w-full divide-y divide-gray-700">
+                <thead className="bg-gray-700">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-primary-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                       Title
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-primary-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-primary-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                       Assigned To
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-primary-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                       Created At
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-primary-200">
+                <tbody className="bg-gray-800 divide-y divide-gray-700">
                   {recentTasks.map((task) => {
                     const assignedUser = users.find(u => u.id === task.assigned_to);
                     return (
                       <tr key={task.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-primary-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                           {task.title}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -167,10 +167,10 @@ function AdminDashboard() {
                             {task.status.replace('_', ' ')}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-primary-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                           {assignedUser ? assignedUser.name : 'Unassigned'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-primary-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                           {new Date(task.created_at).toLocaleDateString()}
                         </td>
                       </tr>

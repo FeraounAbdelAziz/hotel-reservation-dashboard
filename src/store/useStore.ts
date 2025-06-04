@@ -1,160 +1,90 @@
 import { create } from 'zustand';
-import { supabase } from '../lib/supabase';
+import { persist } from 'zustand/middleware';
+import { supabase } from '@/lib/supabase';
 import type { Store, User, Task, StockItem } from './types';
 
-const useStore = create<Store>((set): Store => ({
-  currentUser: null,
-  loading: false,
-  error: null,
+interface StoreState {
+  currentUser: User | null;
+  error: string | null;
+  setCurrentUser: (user: User | null) => void;
+  setError: (error: string | null) => void;
+  login: (code: string) => Promise<boolean>;
+  logout: () => void;
+  checkSession: () => Promise<boolean>;
+}
 
-  login: async (code: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('code', code)
-        .single();
+const SESSION_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
 
-      if (error || !data) {
-        set({ error: 'Invalid code', currentUser: null });
+const useStore = create<StoreState>()(
+  persist(
+    (set, get) => ({
+      currentUser: null,
+      error: null,
+      setCurrentUser: (user) => set({ currentUser: user }),
+      setError: (error) => set({ error }),
+      login: async (code: string) => {
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('code', code)
+            .single();
+
+          if (error || !data) {
+            set({ error: 'Invalid code', currentUser: null });
+            return false;
+          }
+
+          const user = {
+            id: data.id,
+            name: data.name,
+            role: data.role,
+            code: data.code,
+          };
+
+          // Store session expiry
+          const sessionExpiry = Date.now() + SESSION_DURATION;
+          set({ 
+            currentUser: user,
+            error: null,
+            sessionExpiry 
+          });
+
+          return true;
+        } catch (error) {
+          set({ error: 'Login failed', currentUser: null });
+          return false;
+        }
+      },
+      logout: () => {
+        set({ currentUser: null, error: null });
+      },
+      checkSession: async () => {
+        const state = get();
+        const sessionExpiry = (state as any).sessionExpiry;
+
+        // If no session expiry or expired, clear user
+        if (!sessionExpiry || Date.now() > sessionExpiry) {
+          set({ currentUser: null, error: null });
+          return false;
+        }
+
+        // If we have a current user and valid session, return true
+        if (state.currentUser) {
+          return true;
+        }
+
         return false;
-      }
-
-      set({ currentUser: data, error: null });
-      return true;
-    } catch (err) {
-      console.error('Login error:', err);
-      set({ error: (err as Error).message, currentUser: null });
-      return false;
+      },
+    }),
+    {
+      name: 'app-storage',
+      partialize: (state) => ({
+        currentUser: state.currentUser,
+        sessionExpiry: (state as any).sessionExpiry,
+      }),
     }
-  },
-
-  logout: () => {
-    set({ currentUser: null, error: null });
-  },
-
-  addUser: async (user: Omit<User, 'id' | 'created_at'>) => {
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .insert([user]);
-
-      if (error) throw error;
-    } catch (err) {
-      console.error('Add user error:', err);
-      throw err;
-    }
-  },
-
-  updateUser: async (id: string, user: Partial<User>) => {
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update(user)
-        .eq('id', id);
-
-      if (error) throw error;
-    } catch (err) {
-      console.error('Update user error:', err);
-      throw err;
-    }
-  },
-
-  deleteUser: async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-    } catch (err) {
-      console.error('Delete user error:', err);
-      throw err;
-    }
-  },
-
-  addTask: async (task: Omit<Task, 'id' | 'created_at'>) => {
-    try {
-      const { error } = await supabase
-        .from('tasks')
-        .insert([task]);
-
-      if (error) throw error;
-    } catch (err) {
-      console.error('Add task error:', err);
-      throw err;
-    }
-  },
-
-  updateTask: async (id: string, task: Partial<Task>) => {
-    try {
-      const { error } = await supabase
-        .from('tasks')
-        .update(task)
-        .eq('id', id);
-
-      if (error) throw error;
-    } catch (err) {
-      console.error('Update task error:', err);
-      throw err;
-    }
-  },
-
-  deleteTask: async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('tasks')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-    } catch (err) {
-      console.error('Delete task error:', err);
-      throw err;
-    }
-  },
-
-  addStockItem: async (item: Omit<StockItem, 'id' | 'created_at'>) => {
-    try {
-      const { error } = await supabase
-        .from('stock')
-        .insert([item]);
-
-      if (error) throw error;
-    } catch (err) {
-      console.error('Add stock item error:', err);
-      throw err;
-    }
-  },
-
-  updateStockItem: async (id: string, item: Partial<StockItem>) => {
-    try {
-      const { error } = await supabase
-        .from('stock')
-        .update(item)
-        .eq('id', id);
-
-      if (error) throw error;
-    } catch (err) {
-      console.error('Update stock item error:', err);
-      throw err;
-    }
-  },
-
-  deleteStockItem: async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('stock')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-    } catch (err) {
-      console.error('Delete stock item error:', err);
-      throw err;
-    }
-  },
-}));
+  )
+);
 
 export default useStore; 

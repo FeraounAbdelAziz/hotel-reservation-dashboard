@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import Login from './pages/Login';
@@ -8,10 +8,33 @@ import Users from './pages/admin/Users';
 import StockManagerDashboard from './pages/stock/Dashboard';
 import UserDashboard from './pages/user/Dashboard';
 import useStore from './store/useStore';
+import Reservations from './pages/admin/employees/Reservations';
+import Maintenance from './pages/admin/employees/Maintenance';
+import Stock from './pages/admin/employees/Stock';
+import Reports from './pages/admin/employees/Reports';
+import Facilities from './pages/admin/employees/Facilities';
+import { useEffect } from 'react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   allowedRoles: ('admin' | 'stock_manager' | 'user')[];
+}
+
+function SessionCheck() {
+  const { checkSession, currentUser } = useStore();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const isValid = await checkSession();
+      if (!isValid && currentUser) {
+        navigate('/login');
+      }
+    };
+    checkAuth();
+  }, [checkSession, currentUser, navigate]);
+
+  return null;
 }
 
 function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
@@ -33,6 +56,7 @@ function App() {
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <BrowserRouter>
         <div className="min-h-screen bg-background">
+          <SessionCheck />
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<Navigate to="/login" replace />} />
@@ -46,10 +70,17 @@ function App() {
               }
             >
               <Route index element={<AdminDashboard />} />
-              <Route path="users" element={<Users />} />
-              <Route path="stock" element={<div>Stock Management</div>} />
               <Route path="tasks" element={<div>Task Management</div>} />
-              <Route path="settings" element={<div>Settings</div>} />
+              
+              {/* Employee Management Routes */}
+              <Route path="employees">
+                <Route index element={<Users />} />
+                <Route path="reservations" element={<Reservations />} />
+                <Route path="maintenance" element={<Maintenance />} />
+                <Route path="stock" element={<Stock />} />
+                <Route path="reports" element={<Reports />} />
+                <Route path="facilities" element={<Facilities />} />
+              </Route>
             </Route>
 
             <Route 

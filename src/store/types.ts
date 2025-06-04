@@ -1,9 +1,9 @@
 export interface User {
   id: string;
   name: string;
-  role: 'admin' | 'user' | 'stock_manager';
+  role: 'admin' | 'stock_manager' | 'user';
   code: string;
-  created_at: string;
+  created_at?: string;
 }
 
 export interface Task {
