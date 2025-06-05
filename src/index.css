@@ -118,3 +118,23 @@
     @apply bg-background text-foreground;
   }
 }
+/* Target the scrollbar */
+::-webkit-scrollbar {
+  height: 8px; /* for horizontal scrollbars */
+}
+
+/* Track (the background of the scrollbar) */
+::-webkit-scrollbar-track {
+  background: black;
+}
+
+/* Thumb (the draggable handle) */
+::-webkit-scrollbar-thumb {
+  background-color: #333;
+  border-radius: 4px;
+}
+
+/* Optional: Thumb on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
