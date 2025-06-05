@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useStore from '../../store/useStore';
 import type { StockItem } from '../../store/types';
 import {
-  PlusIcon,
   PencilIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';

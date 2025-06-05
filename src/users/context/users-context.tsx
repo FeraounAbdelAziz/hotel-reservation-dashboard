@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
 import useDialogState from '@/hooks/use-dialog-state'
-import { User } from '../data/schema'
+import { type User } from '../data/schema'
 
-type UsersDialogType = 'invite' | 'add' | 'edit' | 'delete'
-
+type UsersDialogType = 'invite' | 'add' | 'edit' | 'delete' | null; // Include null
 interface UsersContextType {
   open: UsersDialogType | null
   setOpen: (str: UsersDialogType | null) => void
@@ -22,9 +21,9 @@ export default function UsersProvider({ children }: Props) {
   const [currentRow, setCurrentRow] = useState<User | null>(null)
 
   return (
-    <UsersContext value={{ open, setOpen, currentRow, setCurrentRow }}>
+    <UsersContext.Provider value={{ open, setOpen, currentRow, setCurrentRow }}>
       {children}
-    </UsersContext>
+    </UsersContext.Provider>
   )
 }
 

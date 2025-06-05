@@ -1,32 +1,53 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
-import { Star, ChevronDown, MapPin, Phone, Mail, Clock, Wifi, Utensils, Waves, Mountain, Car, Shield, Calendar, Users, Search, ChevronRight, User, Maximize2, Loader2 } from 'lucide-react';
-import { rooms } from '@/data/rooms';
-import type { Room } from '@/data/rooms';
-import { RoomDetailsDialog } from '@/components/RoomDetailsDialog';
-import DatePicker from 'react-datepicker';
-import type { DatePickerProps } from 'react-datepicker';
+import { useState } from "react";
+
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+
+import {
+  Star,
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
+  Wifi,
+  Utensils,
+  Waves,
+  Mountain,
+  Car,
+  Shield,
+  Calendar,
+  Users,
+  ChevronRight,
+  Maximize2,
+  Loader2,
+} from "lucide-react";
+import { rooms } from "@/data/rooms";
+import type { Room } from "@/data/rooms";
+import { RoomDetailsDialog } from "@/components/RoomDetailsDialog";
+import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
-import { supabase } from '@/lib/supabase';
+import { supabase } from "@/lib/supabase";
 
 const formSchema = z.object({
-  firstName: z.string().min(2, 'First name must be at least 2 characters'),
-  lastName: z.string().min(2, 'Last name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
-  checkIn: z.date(),
-  checkOut: z.date(),
+  firstName: z.string().min(2, "First name must be at least 2 characters"),
+  lastName: z.string().min(2, "Last name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  checkIn: z.date().nullable(),
+  checkOut: z.date().nullable(),
   roomType: z.string(),
+  guests: z.string(),
   specialRequests: z.string().optional(),
 });
 
@@ -35,32 +56,51 @@ type FormData = z.infer<typeof formSchema>;
 export default function LandingPage() {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [showRoomDetails, setShowRoomDetails] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
-    checkIn: null as Date | null,
-    checkOut: null as Date | null,
+    checkIn: null,
+    checkOut: null,
     roomType: "",
     guests: "2",
-    specialRequests: ""
+    specialRequests: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    
-    const { firstName, lastName, email, phone, checkIn, checkOut, roomType, specialRequests } = formData;
-    
-    if (!firstName || !lastName || !email || !phone || !checkIn || !checkOut || !roomType) {
+
+    const {
+      firstName,
+      lastName,
+      email,
+      phone,
+      checkIn,
+      checkOut,
+      roomType,
+      specialRequests,
+    } = formData;
+
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      !phone ||
+      !checkIn ||
+      !checkOut ||
+      !roomType
+    ) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -73,27 +113,29 @@ export default function LandingPage() {
     setIsLoading(true);
 
     try {
-      const { data: reservation, error: reservationError } = await supabase
-        .from('reservations')
+      const { error: reservationError } = await supabase
+        .from("reservations")
         .insert({
           first_name: firstName,
           last_name: lastName,
           email: email,
           phone: phone,
-          check_in: checkIn.toISOString(),
-          check_out: checkOut.toISOString(),
+          check_in: checkIn?.toISOString(),
+          check_out: checkOut?.toISOString(),
           room_type: roomType,
           guests: parseInt(formData.guests),
           special_requests: specialRequests || null,
-          status: 'pending',
+          status: "pending",
         })
-        .select()
-        .single();
+        .select();
 
-      if (reservationError) throw reservationError;
+      if (reservationError) {
+        toast.error(reservationError.message);
+        return;
+      }
 
       toast.success("Reservation submitted successfully!");
-      
+
       // Reset form
       setFormData({
         firstName: "",
@@ -104,12 +146,10 @@ export default function LandingPage() {
         checkOut: null,
         roomType: "",
         guests: "2",
-        specialRequests: ""
+        specialRequests: "",
       });
-
     } catch (err) {
-      console.error('Error submitting reservation:', err);
-      setError(err instanceof Error ? err.message : 'Failed to submit reservation');
+      console.error("Error submitting reservation:", err);
       toast.error("Failed to submit reservation. Please try again.");
     } finally {
       setIsLoading(false);
@@ -122,61 +162,69 @@ export default function LandingPage() {
   };
 
   const handleBookRoom = (roomId: string) => {
-    setFormData(prev => ({ ...prev, roomType: roomId }));
+    setFormData((prev) => ({ ...prev, roomType: roomId }));
     setShowRoomDetails(false);
     // Scroll to booking form
-    document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById("booking")?.scrollIntoView({ behavior: "smooth" });
   };
 
   const features = [
     {
       icon: <Wifi className="h-8 w-8" />,
       title: "High-Speed WiFi",
-      description: "Stay connected with our complimentary ultra-fast internet throughout the hotel",
-      gradient: "from-amber-500 to-amber-600"
+      description:
+        "Stay connected with our complimentary ultra-fast internet throughout the hotel",
+      gradient: "from-amber-500 to-amber-600",
     },
     {
       icon: <Utensils className="h-8 w-8" />,
       title: "Fine Dining",
-      description: "Savor exquisite cuisine at our award-winning restaurants and elegant bars",
-      gradient: "from-amber-600 to-amber-700"
+      description:
+        "Savor exquisite cuisine at our award-winning restaurants and elegant bars",
+      gradient: "from-amber-600 to-amber-700",
     },
     {
       icon: <Waves className="h-8 w-8" />,
       title: "Luxury Spa",
-      description: "Rejuvenate your senses with world-class spa treatments and wellness services",
-      gradient: "from-amber-700 to-amber-800"
+      description:
+        "Rejuvenate your senses with world-class spa treatments and wellness services",
+      gradient: "from-amber-700 to-amber-800",
     },
     {
       icon: <Mountain className="h-8 w-8" />,
       title: "Infinity Pool",
-      description: "Take a dip in our stunning rooftop pool with breathtaking city views",
-      gradient: "from-amber-800 to-amber-900"
+      description:
+        "Take a dip in our stunning rooftop pool with breathtaking city views",
+      gradient: "from-amber-800 to-amber-900",
     },
     {
       icon: <Car className="h-8 w-8" />,
       title: "Valet Service",
-      description: "Enjoy hassle-free parking with our complimentary valet and car service",
-      gradient: "from-amber-500 to-amber-600"
+      description:
+        "Enjoy hassle-free parking with our complimentary valet and car service",
+      gradient: "from-amber-500 to-amber-600",
     },
     {
       icon: <Shield className="h-8 w-8" />,
       title: "24/7 Security",
-      description: "Rest easy with our round-the-clock security and attentive concierge service",
-      gradient: "from-amber-600 to-amber-700"
+      description:
+        "Rest easy with our round-the-clock security and attentive concierge service",
+      gradient: "from-amber-600 to-amber-700",
     },
     {
       icon: <Calendar className="h-8 w-8" />,
       title: "Event Spaces",
-      description: "Host memorable events in our elegant venues with professional support",
-      gradient: "from-amber-700 to-amber-800"
+      description:
+        "Host memorable events in our elegant venues with professional support",
+      gradient: "from-amber-700 to-amber-800",
     },
     {
       icon: <Users className="h-8 w-8" />,
       title: "Concierge",
-      description: "Let our dedicated team assist with all your needs and special requests",
-      gradient: "from-amber-800 to-amber-900"
-    }
+      description:
+        "Let our dedicated team assist with all your needs and special requests",
+      gradient: "from-amber-800 to-amber-900",
+    },
   ];
 
   // Contact Section
@@ -185,7 +233,9 @@ export default function LandingPage() {
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Contact Us</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Contact Us
+            </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               Get in touch with us for any inquiries or special requests
             </p>
@@ -199,7 +249,9 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <h3 className="font-medium text-gray-900">Location</h3>
-                  <p className="text-gray-600 mt-1">123 Luxury Avenue, City Center</p>
+                  <p className="text-gray-600 mt-1">
+                    123 Luxury Avenue, City Center
+                  </p>
                 </div>
               </div>
             </div>
@@ -242,7 +294,9 @@ export default function LandingPage() {
           </div>
 
           <div className="mt-8 p-6 bg-white rounded-xl shadow-md border border-gray-100">
-            <h3 className="font-medium text-gray-900 mb-4">Additional Information</h3>
+            <h3 className="font-medium text-gray-900 mb-4">
+              Additional Information
+            </h3>
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-600">
               <li className="flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-700" />
@@ -286,14 +340,19 @@ export default function LandingPage() {
                 <span className="text-amber-400">Like Never Before</span>
               </h1>
               <p className="text-xl md:text-2xl text-gray-200 max-w-2xl mx-auto leading-relaxed">
-                Indulge in unparalleled comfort and elegance at our award-winning hotel
+                Indulge in unparalleled comfort and elegance at our
+                award-winning hotel
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button
                 size="lg"
                 className="bg-amber-500 hover:bg-amber-600 text-white px-8 py-6 text-lg rounded-full transition-all duration-300 hover:scale-105 shadow-lg shadow-amber-500/20"
-                onClick={() => document.getElementById("booking")?.scrollIntoView({ behavior: "smooth" })}
+                onClick={() =>
+                  document
+                    .getElementById("booking")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
               >
                 Book Your Stay
               </Button>
@@ -301,7 +360,11 @@ export default function LandingPage() {
                 variant="outline"
                 size="lg"
                 className="bg-white/10 hover:bg-white/20 text-white border-white/20 px-8 py-6 text-lg rounded-full transition-all duration-300 hover:scale-105 backdrop-blur-sm"
-                onClick={() => document.getElementById("rooms")?.scrollIntoView({ behavior: "smooth" })}
+                onClick={() =>
+                  document
+                    .getElementById("rooms")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
               >
                 Explore Rooms
               </Button>
@@ -333,9 +396,12 @@ export default function LandingPage() {
               <span className="text-gray-800">Meets</span>{" "}
               <span className="text-amber-600">Comfort</span>
             </h2>
-            <p className="text-gray-600 text-lg">Experience exceptional amenities and services designed for your comfort</p>
+            <p className="text-gray-600 text-lg">
+              Experience exceptional amenities and services designed for your
+              comfort
+            </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
               <div
@@ -343,15 +409,17 @@ export default function LandingPage() {
                 className="group relative overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-500 hover:shadow-2xl hover:-translate-y-1"
               >
                 {/* Gradient Background */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
-                
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
+                />
+
                 {/* Content */}
                 <div className="relative p-8">
                   {/* Icon Container */}
                   <div className="mb-6 inline-flex items-center justify-center p-3 rounded-xl bg-amber-50 text-amber-600 group-hover:scale-110 transition-transform duration-500">
                     {feature.icon}
                   </div>
-                  
+
                   {/* Text Content */}
                   <div className="space-y-3">
                     <h3 className="text-xl font-semibold text-gray-900 group-hover:text-amber-700 transition-colors duration-300">
@@ -361,7 +429,7 @@ export default function LandingPage() {
                       {feature.description}
                     </p>
                   </div>
-                  
+
                   {/* Hover Effect Line */}
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-amber-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
                 </div>
@@ -374,7 +442,9 @@ export default function LandingPage() {
       {/* Rooms Section */}
       <section id="rooms" className="py-24 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl text-black font-bold text-center mb-16">Our Rooms</h2>
+          <h2 className="text-4xl text-black font-bold text-center mb-16">
+            Our Rooms
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               ...rooms,
@@ -382,7 +452,8 @@ export default function LandingPage() {
                 id: "family",
                 name: "Family Suite",
                 price: 220,
-                description: "Perfect for families with spacious rooms and kid-friendly amenities",
+                description:
+                  "Perfect for families with spacious rooms and kid-friendly amenities",
                 size: "45 m²",
                 maxGuests: 4,
                 bedType: "King Bed + 2 Twin Beds",
@@ -406,13 +477,15 @@ export default function LandingPage() {
                   "Extra storage space",
                   "Blackout curtains",
                 ],
-                longDescription: "Our Family Suite is designed with families in mind, offering spacious accommodations and thoughtful amenities. The suite features a king bed for parents and two twin beds for children, along with a family-friendly bathroom. Enjoy the convenience of a dining area, extra storage space, and child safety features throughout. The connected rooms option allows for even more space when needed."
+                longDescription:
+                  "Our Family Suite is designed with families in mind, offering spacious accommodations and thoughtful amenities. The suite features a king bed for parents and two twin beds for children, along with a family-friendly bathroom. Enjoy the convenience of a dining area, extra storage space, and child safety features throughout. The connected rooms option allows for even more space when needed.",
               },
               {
                 id: "honeymoon",
                 name: "Honeymoon Suite",
                 price: 350,
-                description: "Romantic retreat with premium amenities and special touches",
+                description:
+                  "Romantic retreat with premium amenities and special touches",
                 size: "55 m²",
                 maxGuests: 2,
                 bedType: "King Bed",
@@ -438,8 +511,9 @@ export default function LandingPage() {
                   "Special turndown service",
                   "Rose petal decoration",
                 ],
-                longDescription: "Experience romance and luxury in our Honeymoon Suite. This intimate retreat features a king-size canopy bed, private balcony, and a luxurious jacuzzi bathroom. Enjoy special touches like champagne service, romantic dining options, and premium amenities. The suite is designed for couples seeking a memorable and romantic getaway."
-              }
+                longDescription:
+                  "Experience romance and luxury in our Honeymoon Suite. This intimate retreat features a king-size canopy bed, private balcony, and a luxurious jacuzzi bathroom. Enjoy special touches like champagne service, romantic dining options, and premium amenities. The suite is designed for couples seeking a memorable and romantic getaway.",
+              },
             ].map((room) => (
               <div
                 key={room.id}
@@ -455,10 +529,12 @@ export default function LandingPage() {
                   />
                   {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  
+
                   {/* Price Tag */}
                   <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
-                    <span className="text-lg font-bold text-amber-600">${room.price}</span>
+                    <span className="text-lg font-bold text-amber-600">
+                      ${room.price}
+                    </span>
                     <span className="text-sm text-gray-600">/night</span>
                   </div>
 
@@ -476,7 +552,9 @@ export default function LandingPage() {
                     </h3>
                     <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-full">
                       <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                      <span className="text-sm font-medium text-amber-800">4.9</span>
+                      <span className="text-sm font-medium text-amber-800">
+                        4.9
+                      </span>
                     </div>
                   </div>
 
@@ -495,9 +573,9 @@ export default function LandingPage() {
                         <span>{room.size}</span>
                       </div>
                     </div>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       className="text-amber-600 hover:text-amber-700 hover:bg-amber-50 transition-colors duration-300"
                     >
                       View Details
@@ -519,18 +597,28 @@ export default function LandingPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">Book Your Stay</h2>
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                Book Your Stay
+              </h2>
               <p className="text-gray-600">
                 Fill in your details to make a reservation
               </p>
             </div>
 
             {/* Booking Form */}
-            <form onSubmit={handleSubmit} className="space-y-6 bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-100">
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-6 bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-100"
+            >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* First Name */}
                 <div className="space-y-2">
-                  <Label htmlFor="first_name" className="text-sm font-medium text-gray-700">First Name</Label>
+                  <Label
+                    htmlFor="first_name"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    First Name
+                  </Label>
                   <Input
                     id="first_name"
                     name="first_name"
@@ -544,7 +632,12 @@ export default function LandingPage() {
 
                 {/* Last Name */}
                 <div className="space-y-2">
-                  <Label htmlFor="last_name" className="text-sm font-medium text-gray-700">Last Name</Label>
+                  <Label
+                    htmlFor="last_name"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Last Name
+                  </Label>
                   <Input
                     id="last_name"
                     name="lastName"
@@ -558,7 +651,12 @@ export default function LandingPage() {
 
                 {/* Email */}
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
+                  <Label
+                    htmlFor="email"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Email
+                  </Label>
                   <Input
                     id="email"
                     name="email"
@@ -573,7 +671,12 @@ export default function LandingPage() {
 
                 {/* Phone */}
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-sm font-medium text-gray-700">Phone</Label>
+                  <Label
+                    htmlFor="phone"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Phone
+                  </Label>
                   <Input
                     id="phone"
                     name="phone"
@@ -588,11 +691,20 @@ export default function LandingPage() {
 
                 {/* Check-in Date */}
                 <div className="space-y-2">
-                  <Label htmlFor="check_in" className="text-sm font-medium text-gray-700">Check-in Date</Label>
+                  <Label
+                    htmlFor="check_in"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Check-in Date
+                  </Label>
                   <div className="relative">
                     <DatePicker
                       selected={formData.checkIn}
-                      onChange={(date: Date | null) => handleChange({ target: { name: 'checkIn', value: date } } as any)}
+                      onChange={(date: Date | null) =>
+                        handleChange({
+                          target: { name: "checkIn", value: date },
+                        } as any)
+                      }
                       selectsStart
                       startDate={formData.checkIn}
                       endDate={formData.checkOut}
@@ -608,11 +720,20 @@ export default function LandingPage() {
 
                 {/* Check-out Date */}
                 <div className="space-y-2">
-                  <Label htmlFor="check_out" className="text-sm font-medium text-gray-700">Check-out Date</Label>
+                  <Label
+                    htmlFor="check_out"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Check-out Date
+                  </Label>
                   <div className="relative">
                     <DatePicker
                       selected={formData.checkOut}
-                      onChange={(date: Date | null) => handleChange({ target: { name: 'checkOut', value: date } } as any)}
+                      onChange={(date: Date | null) =>
+                        handleChange({
+                          target: { name: "checkOut", value: date },
+                        } as any)
+                      }
                       selectsEnd
                       startDate={formData.checkIn}
                       endDate={formData.checkOut}
@@ -628,11 +749,20 @@ export default function LandingPage() {
 
                 {/* Room Type */}
                 <div className="space-y-2">
-                  <Label htmlFor="room_type" className="text-sm font-medium text-gray-700">Room Type</Label>
+                  <Label
+                    htmlFor="room_type"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Room Type
+                  </Label>
                   <Select
                     name="room_type"
                     value={formData.roomType}
-                    onValueChange={(value) => handleChange({ target: { name: 'roomType', value } } as any)}
+                    onValueChange={(value) =>
+                      handleChange({
+                        target: { name: "roomType", value },
+                      } as any)
+                    }
                     required
                   >
                     <SelectTrigger className="h-12 px-4 rounded-lg border-2 border-gray-200 bg-white/50 backdrop-blur-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all duration-200">
@@ -640,8 +770,8 @@ export default function LandingPage() {
                     </SelectTrigger>
                     <SelectContent>
                       {rooms.map((room) => (
-                        <SelectItem 
-                          key={room.id} 
+                        <SelectItem
+                          key={room.id}
                           value={room.id}
                           className="focus:bg-amber-50 focus:text-amber-900"
                         >
@@ -654,11 +784,18 @@ export default function LandingPage() {
 
                 {/* Guests */}
                 <div className="space-y-2">
-                  <Label htmlFor="guests" className="text-sm font-medium text-gray-700">Number of Guests</Label>
+                  <Label
+                    htmlFor="guests"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Number of Guests
+                  </Label>
                   <Select
                     name="guests"
                     value={formData.guests}
-                    onValueChange={(value) => handleChange({ target: { name: 'guests', value } } as any)}
+                    onValueChange={(value) =>
+                      handleChange({ target: { name: "guests", value } } as any)
+                    }
                     required
                   >
                     <SelectTrigger className="h-12 px-4 rounded-lg border-2 border-gray-200 bg-white/50 backdrop-blur-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all duration-200">
@@ -666,12 +803,12 @@ export default function LandingPage() {
                     </SelectTrigger>
                     <SelectContent>
                       {[1, 2, 3, 4, 5, 6].map((num) => (
-                        <SelectItem 
-                          key={num} 
+                        <SelectItem
+                          key={num}
                           value={num.toString()}
                           className="focus:bg-amber-50 focus:text-amber-900"
                         >
-                          {num} {num === 1 ? 'Guest' : 'Guests'}
+                          {num} {num === 1 ? "Guest" : "Guests"}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -681,7 +818,12 @@ export default function LandingPage() {
 
               {/* Special Requests */}
               <div className="space-y-2">
-                <Label htmlFor="special_requests" className="text-sm font-medium text-gray-700">Special Requests</Label>
+                <Label
+                  htmlFor="special_requests"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Special Requests
+                </Label>
                 <Textarea
                   id="special_requests"
                   name="specialRequests"
@@ -692,8 +834,8 @@ export default function LandingPage() {
                 />
               </div>
 
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full h-12 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
                 disabled={isLoading}
               >
@@ -761,13 +903,22 @@ export default function LandingPage() {
             <div>
               <h3 className="text-xl font-semibold mb-6">Follow Us</h3>
               <div className="flex space-x-6">
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                <a
+                  href="#"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
                   Facebook
                 </a>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                <a
+                  href="#"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
                   Instagram
                 </a>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                <a
+                  href="#"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
                   Twitter
                 </a>
               </div>
@@ -790,4 +941,4 @@ export default function LandingPage() {
       )}
     </div>
   );
-} 
+}

@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { supabase } from '../../lib/supabase';
 import {
-  PlusIcon,
   PencilIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';

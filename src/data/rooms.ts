@@ -1,6 +1,3 @@
-import type { ReactNode } from "react";
-import { BedDouble, Coffee, Tv, Wifi, Bath, AirVent, Utensils, Waves, Mountain, Sun } from "lucide-react";
-
 export interface RoomAmenity {
   icon: keyof typeof import("./roomIcons").roomIcons;
   name: string;

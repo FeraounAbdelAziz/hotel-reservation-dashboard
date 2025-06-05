@@ -2,7 +2,6 @@ import { useState } from 'react';
 import type {
   ColumnDef,
   ColumnFiltersState,
-  RowData,
   SortingState,
   VisibilityState,
 } from '@tanstack/react-table';
@@ -26,7 +25,6 @@ import {
 } from '@/components/ui/table';
 import { DataTablePagination } from '@/users/components/data-table-pagination';
 import { DataTableToolbar } from '@/users/components/data-table-toolbar';
-import { cn } from '@/lib/utils';
 
 interface ReservationTableProps {
   columns: ColumnDef<any>[];

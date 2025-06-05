@@ -1,4 +1,4 @@
-import { BedDouble, Coffee, Tv, Wifi, Bath, AirVent, Utensils } from "lucide-react";
+import { Coffee, Tv, Wifi, Bath, AirVent, Utensils } from "lucide-react";
 
 export const roomIcons = {
   wifi: <Wifi className="text-amber-700" />,

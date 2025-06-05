@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import useStore from '../../store/useStore';
+import  { useState, useEffect } from 'react';
 import type { Task, StockItem } from '../../store/types';
 import {
   UsersIcon,
@@ -11,7 +10,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { supabase } from '@/lib/supabase';
 
 function AdminDashboard() {
-  const { currentUser } = useStore();
+  // const { currentUser } = useStore();
   const [employees, setEmployees] = useState<any[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [stock, setStock] = useState<StockItem[]>([]);

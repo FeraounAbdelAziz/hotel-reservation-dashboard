@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
-import type { Store, User, Task, StockItem } from './types'
+import type { Store, User } from './types'
 
 const useStore = create<Store>((set, get) => ({
   currentUser: null,
@@ -20,7 +20,7 @@ const useStore = create<Store>((set, get) => ({
     set({ loading: true, error: null })
     try {
       // Check the code in profiles table first
-      const { data: profile, error: profileError } = await supabase
+      const { data: profile } = await supabase
         .from('profiles')
         .select('*')
         .eq('code', code)
