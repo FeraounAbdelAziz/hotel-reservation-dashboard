@@ -5,35 +5,34 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
+export type Reservation = {
+  id: string
+  first_name: string
+  last_name: string
+  email: string
+  phone: string
+  check_in: string
+  check_out: string
+  room_type: string
+  guests: number
+  special_requests: string | null
+  status: 'pending' | 'confirmed' | 'cancelled'
+  created_at: string
+}
+
 // Initialize database tables and policies
 export async function initDatabase() {
   try {
-    // Check if tables exist by trying to select from them
-    const tables = ['profiles', 'tasks', 'stock', 'reservations']
-    for (const table of tables) {
-      const { error } = await supabase
-        .from(table)
-        .select('id')
-        .limit(1)
-        .maybeSingle()
+    // Check if reservations table exists
+    const { error } = await supabase
+      .from('reservations')
+      .select('id')
+      .limit(1)
+      .maybeSingle()
 
-      if (error?.code === 'PGRST116') {
-        console.error(`Table '${table}' does not exist. Please create it in the Supabase dashboard.`)
-      }
+    if (error?.code === 'PGRST116') {
+      console.error('Table "reservations" does not exist. Please create it in the Supabase dashboard.')
     }
-
-    // Insert admin user if not exists
-    const { error: adminError } = await supabase
-      .from('profiles')
-      .upsert({
-        name: 'Admin',
-        role: 'admin',
-        code: '9999999'
-      }, {
-        onConflict: 'code'
-      })
-    if (adminError) throw adminError
-
   } catch (error) {
     console.error('Database initialization error:', error)
   }

@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-route
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import Login from './pages/Login';
+import LandingPage from './pages/LandingPage';
 import AdminLayout from './pages/admin/Layout';
 import AdminDashboard from './pages/admin/Dashboard';
 import Users from './pages/admin/Users';
@@ -63,6 +64,7 @@ function App() {
           <SessionCheck />
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/landing" element={<LandingPage />} />
             <Route path="/" element={<Navigate to="/login" replace />} />
             
             <Route 

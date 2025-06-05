@@ -1,15 +1,19 @@
 import { Outlet } from 'react-router-dom';
-import { ReservationEmployeeSidebar } from '@/components/ReservationEmployeeSidebar';
+import ReservationEmployeeSidebar from '@/components/ReservationEmployeeSidebar';
 import Navbar from '@/components/Navbar';
 
-export default function ReservationEmployeeLayout() {
+interface ReservationEmployeeLayoutProps {
+  children?: React.ReactNode;
+}
+
+export default function ReservationEmployeeLayout({ children }: ReservationEmployeeLayoutProps) {
   return (
-    <div className="flex h-screen">
+    <div className="min-h-screen bg-background">
       <ReservationEmployeeSidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 ml-64">
         <Navbar />
-        <main className="flex-1 overflow-y-auto bg-background">
-          <Outlet />
+        <main className="p-8">
+          {children || <Outlet />}
         </main>
       </div>
     </div>

@@ -78,109 +78,103 @@ function AdminDashboard() {
     <div className="container mx-auto p-4 space-y-4">
       <h1 className="text-2xl font-bold">Admin Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-gray-800 border-gray-700">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-gray-200">Employees</CardTitle>
+            <CardTitle>Employees</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-gray-200">{employees?.length || 0}</p>
+            <p className="text-2xl font-bold">{employees?.length || 0}</p>
           </CardContent>
         </Card>
-        <Card className="bg-gray-800 border-gray-700">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-gray-200">Tasks</CardTitle>
+            <CardTitle>Tasks</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-gray-200">{tasks?.length || 0}</p>
+            <p className="text-2xl font-bold">{tasks?.length || 0}</p>
           </CardContent>
         </Card>
-        <Card className="bg-gray-800 border-gray-700">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-gray-200">Stock Items</CardTitle>
+            <CardTitle>Stock Items</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-gray-200">{stock?.length || 0}</p>
+            <p className="text-2xl font-bold">{stock?.length || 0}</p>
           </CardContent>
         </Card>
       </div>
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat) => (
-            <div
-              key={stat.name}
-              className="bg-gray-800 overflow-hidden shadow rounded-lg border border-gray-700"
-            >
-              <div className="p-5">
-                <div className="flex items-center">
-                  <div className={`flex-shrink-0 rounded-md p-3 ${stat.color}`}>
-                    <stat.icon className="h-6 w-6 text-white" aria-hidden="true" />
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-300 truncate">
-                        {stat.name}
-                      </dt>
-                      <dd className="text-lg font-semibold text-gray-200">
-                        {stat.value}
-                      </dd>
-                    </dl>
-                  </div>
+      
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat) => (
+          <Card key={stat.name}>
+            <CardContent className="p-5">
+              <div className="flex items-center">
+                <div className={`flex-shrink-0 rounded-md p-3 ${stat.color}`}>
+                  <stat.icon className="h-6 w-6 text-white" aria-hidden="true" />
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium truncate">
+                      {stat.name}
+                    </dt>
+                    <dd className="text-lg font-semibold">
+                      {stat.value}
+                    </dd>
+                  </dl>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="bg-gray-800 shadow sm:rounded-lg border border-gray-700">
-          <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg font-medium leading-6 text-gray-200 mb-4">
-              Recent Tasks
-            </h3>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-700">
-                <thead className="bg-gray-700">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Title
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Assigned To
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Created At
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-gray-800 divide-y divide-gray-700">
-                  {recentTasks.map((task) => {
-                    return (
-                      <tr key={task.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                          {task.title}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(task.status)}`}>
-                            {task.status.replace('_', ' ')}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                          {task.assigned_to || 'Unassigned'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                          {new Date(task.created_at).toLocaleDateString()}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Tasks</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-border">
+              <thead>
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                    Title
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                    Assigned To
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                    Created At
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {recentTasks.map((task) => (
+                  <tr key={task.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      {task.title}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(task.status)}`}>
+                        {task.status.replace('_', ' ')}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      {task.assigned_to || 'Unassigned'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      {new Date(task.created_at).toLocaleDateString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
