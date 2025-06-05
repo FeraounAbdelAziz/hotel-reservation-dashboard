@@ -27,7 +27,10 @@ function StockDashboard() {
       updateStockItem(editingItem.id, data);
       setEditingItem(null);
     } else {
-      addStockItem(data);
+      addStockItem({
+        ...data,
+        last_restocked: new Date().toISOString()
+      });
     }
     reset();
   };

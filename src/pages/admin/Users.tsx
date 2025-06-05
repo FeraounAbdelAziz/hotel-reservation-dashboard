@@ -125,7 +125,7 @@ export default function Users() {
                   </TableCell>
                   <TableCell>{user.code}</TableCell>
                   <TableCell>
-                    {new Date(user.created_at).toLocaleDateString()}
+                    {user.created_at ? new Date(user.created_at).toLocaleDateString() : '-'}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="icon">

@@ -43,7 +43,7 @@ function Login() {
       
       toast({
         title: "Welcome back!",
-        description: `Logged in as ${user.name}`,
+        description: `Logged in as ${user.name || user.first_name} `,
       });
       
       // Navigate based on role
@@ -56,6 +56,9 @@ function Login() {
           break;
         case 'user':
           navigate('/user');
+          break;
+        case 'reservation_employee':
+          navigate('/employee/reservations');
           break;
       }
     } catch (err) {

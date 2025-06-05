@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import useStore from '../../store/useStore';
-import type { User, Task, StockItem } from '../../store/types';
+import type { Task, StockItem } from '../../store/types';
 import {
   UsersIcon,
   ClipboardDocumentListIcon,
@@ -12,17 +12,17 @@ import { supabase } from '@/lib/supabase';
 
 function AdminDashboard() {
   const { currentUser } = useStore();
-  const [users, setUsers] = useState<User[]>([]);
+  const [employees, setEmployees] = useState<any[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [stock, setStock] = useState<StockItem[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data: usersData } = await supabase.from('profiles').select('*');
+      const { data: employeesData } = await supabase.from('reservation_employees').select('*');
       const { data: tasksData } = await supabase.from('tasks').select('*');
       const { data: stockData } = await supabase.from('stock').select('*');
 
-      setUsers(usersData || []);
+      setEmployees(employeesData || []);
       setTasks(tasksData || []);
       setStock(stockData || []);
     };
@@ -32,8 +32,8 @@ function AdminDashboard() {
 
   const stats = [
     {
-      name: 'Total Users',
-      value: users.length,
+      name: 'Total Employees',
+      value: employees.length,
       icon: UsersIcon,
       color: 'bg-blue-500',
     },
@@ -80,10 +80,10 @@ function AdminDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="bg-gray-800 border-gray-700">
           <CardHeader>
-            <CardTitle className="text-gray-200">Users</CardTitle>
+            <CardTitle className="text-gray-200">Employees</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-gray-200">{users?.length || 0}</p>
+            <p className="text-2xl font-bold text-gray-200">{employees?.length || 0}</p>
           </CardContent>
         </Card>
         <Card className="bg-gray-800 border-gray-700">
@@ -156,7 +156,6 @@ function AdminDashboard() {
                 </thead>
                 <tbody className="bg-gray-800 divide-y divide-gray-700">
                   {recentTasks.map((task) => {
-                    const assignedUser = users.find(u => u.id === task.assigned_to);
                     return (
                       <tr key={task.id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
@@ -168,7 +167,7 @@ function AdminDashboard() {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                          {assignedUser ? assignedUser.name : 'Unassigned'}
+                          {task.assigned_to || 'Unassigned'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                           {new Date(task.created_at).toLocaleDateString()}

@@ -23,7 +23,8 @@ function Navbar() {
     navigate('/login');
   };
 
-  const getInitials = (name: string) => {
+  const getInitials = (name: string | undefined) => {
+    if (!name) return '?';
     return name
       .split(' ')
       .map((n) => n[0])
@@ -39,6 +40,8 @@ function Navbar() {
         return 'bg-blue-500/10 text-blue-500';
       case 'user':
         return 'bg-green-500/10 text-green-500';
+      case 'reservation_employee':
+        return 'bg-purple-500/10 text-purple-500';
       default:
         return 'bg-gray-500/10 text-gray-500';
     }

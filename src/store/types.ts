@@ -1,7 +1,14 @@
 export interface User {
   id: string;
   name: string;
-  role: 'admin' | 'stock_manager' | 'user';
+  first_name: string;
+  last_name : string;
+  telephone: string;
+  address: string;
+  email: string;
+  ccp: string;
+  file_url: string | null;
+  role: 'admin' | 'stock_manager' | 'user' | 'reservation_employee';
   code: string;
   created_at?: string;
 }
@@ -18,18 +25,28 @@ export interface Task {
 export interface StockItem {
   id: string;
   name: string;
-  quantity: number;
   category: string;
+  quantity: number;
+  unit: string;
+  description?: string;
   last_restocked: string;
   created_at: string;
 }
 
 export interface Store {
   currentUser: User | null;
+  users: User[];
+  tasks: Task[];
+  stock: StockItem[];
   loading: boolean;
   error: string | null;
+  
+  // Auth functions
   login: (code: string) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<void>;
+  checkSession: () => Promise<boolean>;
+  signup: (email: string, password: string, role: User['role']) => Promise<void>;
+  
   addUser: (user: Omit<User, 'id' | 'created_at'>) => Promise<void>;
   updateUser: (id: string, user: Partial<User>) => Promise<void>;
   deleteUser: (id: string) => Promise<void>;

@@ -11,26 +11,46 @@ const useStore = create<Store>((set, get) => ({
   error: null,
 
   // Auth functions
+  checkSession: async () => {
+    const { currentUser } = get();
+    return !!currentUser;
+  },
+
   login: async (code: string) => {
     set({ loading: true, error: null })
     try {
-      // Just check the code in profiles table
-      const { data: profile, error } = await supabase
+      // Check the code in profiles table first
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('code', code)
         .single()
-
-      if (error) throw error
+        // console.log(profile,profileError)
 
       if (profile) {
-        // Set current user directly from profile
         set({ currentUser: profile, loading: false })
-      } else {
-        throw new Error('Invalid code')
+        return true
       }
+
+      // If not found, check reservation_employees table
+      const { data: reservationEmployee, error: employeeError } = await supabase
+        .from('reservation_employees')
+        .select('*')
+        .eq('code', code)
+        .single()
+        console.log(reservationEmployee,employeeError)
+
+      if (reservationEmployee) {
+        set({ currentUser: { ...reservationEmployee, role: 'reservation_employee' }, loading: false })
+        return true
+      }
+
+      // If not found in either, set error
+      set({ error: 'Invalid code', loading: false })
+      return false
     } catch (error) {
       set({ error: (error as Error).message, loading: false })
+      return false
     }
   },
 

@@ -14,10 +14,14 @@ import Stock from './pages/admin/employees/Stock';
 import Reports from './pages/admin/employees/Reports';
 import Facilities from './pages/admin/employees/Facilities';
 import { useEffect } from 'react';
+import ReservationEmployeeDashboard from './pages/employee/ReservationEmployeeDashboard';
+import ReservationEmployeeLayout from './layouts/ReservationEmployeeLayout';
+import ReservationList from './pages/employee/ReservationList';
+import Rooms from './pages/employee/Rooms';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedRoles: ('admin' | 'stock_manager' | 'user')[];
+  allowedRoles: ('admin' | 'stock_manager' | 'user' | 'reservation_employee')[];
 }
 
 function SessionCheck() {
@@ -99,6 +103,19 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/employee" 
+              element={
+                <ProtectedRoute allowedRoles={['reservation_employee']}>
+                  <ReservationEmployeeLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Navigate to="reservations" replace />} />
+              <Route path="reservations" element={<ReservationEmployeeDashboard />} />
+              <Route path="reservation-list" element={<ReservationList />} />
+              <Route path="rooms" element={<Rooms />} />
+            </Route>
           </Routes>
           <Toaster />
         </div>
