@@ -35,7 +35,7 @@ export const reservationColumns: ColumnDef<any>[] = [
     accessorKey: 'status',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
     cell: ({ row }) => {
-      const status = row.getValue('status');
+      const status = String(row.getValue('status'));
       const color = status === 'active' ? 'bg-green-600' : status === 'pending' ? 'bg-yellow-500' : status === 'cancelled' ? 'bg-red-500' : status === 'confirmed' ? 'bg-blue-500' : 'bg-gray-500';
       return <Badge className={`${color} text-white capitalize`}>{status}</Badge>;
     },

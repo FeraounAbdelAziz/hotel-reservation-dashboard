@@ -2,7 +2,6 @@ import { Link, useLocation } from "react-router-dom";
 import {
   CalendarDaysIcon,
   HomeIcon,
-  ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import useStore from "@/store/useStore";
 import { LogOut } from "lucide-react";

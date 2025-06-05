@@ -1,8 +1,8 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import type { Room } from "@/data/rooms";
 import { useState, useCallback, useEffect } from "react";
-import { ChevronLeft, ChevronRight, X, Star, Users, Maximize2, BedDouble, ArrowLeft, ArrowRight } from "lucide-react";
+import { X, Star, Users, Maximize2, BedDouble, ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { roomIcons } from "@/data/roomIcons";
 
