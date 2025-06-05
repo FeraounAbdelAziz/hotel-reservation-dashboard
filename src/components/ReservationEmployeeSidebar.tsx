@@ -1,8 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import {
-  CalendarDaysIcon,
-  HomeIcon,
-} from "@heroicons/react/24/outline";
+import { CalendarDaysIcon, HomeIcon } from "@heroicons/react/24/outline";
 import useStore from "@/store/useStore";
 import { LogOut } from "lucide-react";
 
@@ -18,6 +15,7 @@ export default function ReservationEmployeeSidebar() {
       icon: CalendarDaysIcon,
     },
     { name: "Rooms", href: "/employee/rooms", icon: HomeIcon },
+    { name: "reservation history", href: "/employee/reservation history", icon: HomeIcon },
   ];
 
   const handleLogout = async () => {
