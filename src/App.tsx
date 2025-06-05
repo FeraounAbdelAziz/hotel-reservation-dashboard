@@ -15,7 +15,7 @@ import Stock from './pages/admin/employees/Stock';
 import Reports from './pages/admin/employees/Reports';
 import Facilities from './pages/admin/employees/Facilities';
 import { useEffect } from 'react';
-import ReservationEmployeeDashboard from './pa,ges/employee/ReservationEmployeeDashboard';
+import ReservationEmployeeDashboard from './pages/employee/ReservationEmployeeDashboard';
 import ReservationList from './pages/employee/ReservationList';
 import Rooms from './pages/employee/Rooms';
 import ReservationEmployeeLayout from './layouts/ReservationEmployeeLayout';
