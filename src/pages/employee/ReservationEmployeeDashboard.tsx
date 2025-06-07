@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ReservationTable } from "./components/reservations-table";
-import { reservationColumns } from "./components/reservations-columns";
 import { Skeleton } from "@/components/ui/skeleton";
+import { reservationColumns } from "./components/reservations-columns";
 
 interface Reservation {
   id: string;
@@ -26,6 +26,7 @@ export default function ReservationEmployeeDashboard() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
     const fetchReservations = async () => {
       try {
         const { data, error } = await supabase
@@ -34,17 +35,17 @@ export default function ReservationEmployeeDashboard() {
           .order('created_at', { ascending: false });
 
         if (error) throw error;
-        
-        setReservations(data || []);
+        if (isMounted) setReservations(data || []);
       } catch (err) {
         console.error("Error fetching reservations:", err);
-        setError("Failed to load reservations. Please try again later.");
+        if (isMounted) setError("Failed to load reservations. Please try again later.");
       } finally {
-        setIsLoading(false);
+        if (isMounted) setIsLoading(false);
       }
     };
 
     fetchReservations();
+    return () => { isMounted = false; };
   }, []);
 
   if (isLoading) {

@@ -15,7 +15,7 @@ export default function ReservationEmployeeSidebar() {
       icon: CalendarDaysIcon,
     },
     { name: "Rooms", href: "/employee/rooms", icon: HomeIcon },
-    { name: "reservation history", href: "/employee/reservation history", icon: HomeIcon },
+    { name: "reservation history", href: "/employee/reservation-history", icon: HomeIcon },
   ];
 
   const handleLogout = async () => {
