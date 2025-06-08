@@ -17,12 +17,14 @@ import Facilities from './pages/admin/employees/Facilities';
 import { useEffect } from 'react';
 import ReservationList from './pages/employee/ReservationList';
 import Rooms from './pages/employee/Rooms';
+import AdminRooms from './pages/admin/Rooms';
 import ReservationEmployeeLayout from './layouts/ReservationEmployeeLayout';
 import ReservationEmployeeDashboard from './pages/employee/ReservationEmployeeDashboard';
+import ReservationHistoryEmployeeDashboard from './pages/employee/ReservationHistoryEmployeeDashboard';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedRoles: ('admin' | 'stock_manager' | 'user' | 'reservation_employee')[];
+  allowedRoles: ('admin' | 'stock_manager' | 'user' | 'employees')[];
 }
 
 function SessionCheck() {
@@ -77,6 +79,7 @@ function App() {
             >
               <Route index element={<AdminDashboard />} />
               <Route path="tasks" element={<div>Task Management</div>} />
+              <Route path="rooms" element={<AdminRooms />} />
               
               {/* Employee Management Routes */}
               <Route path="employees">
@@ -108,7 +111,7 @@ function App() {
             <Route 
               path="/employee" 
               element={
-                <ProtectedRoute allowedRoles={['reservation_employee']}>
+                <ProtectedRoute allowedRoles={['employees']}>
                   <ReservationEmployeeLayout />
                 </ProtectedRoute>
               }
@@ -117,6 +120,7 @@ function App() {
               <Route path="reservations" element={<ReservationEmployeeDashboard />} />
               <Route path="reservation-list" element={<ReservationList />} />
               <Route path="rooms" element={<Rooms />} />
+              <Route path="reservation-history" element={<ReservationHistoryEmployeeDashboard />} />
             </Route>
           </Routes>
           <Toaster />

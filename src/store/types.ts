@@ -8,7 +8,7 @@ export interface User {
   email: string;
   ccp: string;
   file_url: string | null;
-  role: 'admin' | 'stock_manager' | 'user' | 'reservation_employee';
+  role: 'admin' | 'stock_manager' | 'user' | 'employees';
   code: string;
   created_at?: string;
 }

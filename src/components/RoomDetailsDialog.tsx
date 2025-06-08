@@ -1,4 +1,4 @@
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import type { Room } from "@/data/rooms";
 import { useState, useCallback, useEffect } from "react";
@@ -43,7 +43,14 @@ export function RoomDetailsDialog({ room, open, onOpenChange, onBook }: RoomDeta
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-7xl max-h-[95vh] overflow-hidden p-0 bg-black/95">
+      {/* <VisuallyHidden>  */}
+      <DialogContent className=" max-w-7xl max-h-[95vh] overflow-hidden p-0 bg-black/95">
+        <DialogHeader className="sr-only">
+          <DialogTitle className="sr-only"></DialogTitle>
+          <DialogDescription className="sr-only">
+            {room.description}
+          </DialogDescription>
+        </DialogHeader>
         {/* Close button */}
         <button
           onClick={() => onOpenChange(false)}
@@ -213,6 +220,7 @@ export function RoomDetailsDialog({ room, open, onOpenChange, onBook }: RoomDeta
           </div>
         </div>
       </DialogContent>
+      {/* <VisuallyHidden/>  */}
     </Dialog>
   );
 } 

@@ -57,7 +57,7 @@ function Login() {
         case 'user':
           navigate('/user');
           break;
-        case 'reservation_employee':
+        case 'employees':
           navigate('/employee/reservations');
           break;
       }

@@ -61,12 +61,11 @@ export function ReservationTable({ columns, data }: ReservationTableProps) {
 
   return (
     <div className='space-y-4'>
-      <DataTableToolbar 
-        table={table} 
-        filterColumns={[
-          { id: 'email', placeholder: 'Filter by email...' },
-          { id: 'phone', placeholder: 'Filter by phone number...' },
-        ]}
+      <DataTableToolbar table={table} 
+      filterColumns={[
+        { id: 'changed_by', placeholder: 'Filter by Changed By...' },
+        { id: 'field_changed', placeholder: 'Filter by Field Changed...' },
+      ]}
       />
       <div className='rounded-md border'>
         <div className='overflow-x-auto'>

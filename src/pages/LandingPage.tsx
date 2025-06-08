@@ -621,7 +621,7 @@ export default function LandingPage() {
                   </Label>
                   <Input
                     id="first_name"
-                    name="first_name"
+                    name="firstName"
                     value={formData.firstName}
                     onChange={handleChange}
                     required

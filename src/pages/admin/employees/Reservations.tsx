@@ -55,14 +55,14 @@ type ReservationEmployee = {
   updated_at: string;
 };
 
-// Helper to generate a unique 7-digit code for reservation_employees
+// Helper to generate a unique 7-digit code for employees
 async function generateUniqueEmployeeCode() {
   let code;
   let exists = true;
   while (exists) {
     code = Math.floor(1000000 + Math.random() * 9000000).toString();
     const { data } = await supabase
-      .from("reservation_employees")
+      .from("employees")
       .select("id")
       .eq("code", code)
       .single();
@@ -323,7 +323,7 @@ export default function Reservations() {
   const fetchEmployees = async () => {
     try {
       const { data, error } = await supabase
-        .from("reservation_employees")
+        .from("employees")
         .select("*")
         .order("created_at", { ascending: false });
 
@@ -367,7 +367,7 @@ export default function Reservations() {
           updated_at: new Date().toISOString(),
         };
         const { error } = await supabase
-          .from("reservation_employees")
+          .from("employees")
           .update(employeeData)
           .eq("id", editingEmployee.id);
         if (error) throw error;
@@ -376,10 +376,10 @@ export default function Reservations() {
           description: "Employee updated successfully",
         });
       } else {
-        // Generate a unique 7-digit code for reservation_employees
+        // Generate a unique 7-digit code for employees
         const code = await generateUniqueEmployeeCode();
-        // Insert into reservation_employees with the code
-        const { error } = await supabase.from("reservation_employees").insert([
+        // Insert into employees with the code
+        const { error } = await supabase.from("employees").insert([
           {
             first_name: values.first_name,
             last_name: values.last_name,
@@ -417,7 +417,7 @@ export default function Reservations() {
 
     try {
       const { error } = await supabase
-        .from("reservation_employees")
+        .from("employees")
         .delete()
         .eq("id", id);
 

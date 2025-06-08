@@ -3,7 +3,6 @@ import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
   Users,
-  ClipboardList,
   ChevronDown,
   Building2,
   Wrench,
@@ -11,6 +10,7 @@ import {
   CalendarDays,
   FileText,
   LogOut,
+  User2,
 } from 'lucide-react';
 import useStore from '@/store/useStore';
 import { useState } from 'react';
@@ -25,7 +25,7 @@ const employeeLinks = [
 
 const mainNavItems = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-  { name: 'Tasks', href: '/admin/tasks', icon: ClipboardList },
+  { name: 'Rooms', href: '/admin/rooms', icon: User2 },
 ];
 
 export function Sidebar() {

@@ -5,26 +5,36 @@ import { Input } from '@/components/ui/input'
 import { DataTableFacetedFilter } from './data-table-faceted-filter'
 import { DataTableViewOptions } from './data-table-view-options'
 
+interface FilterColumn {
+  id: string
+  placeholder: string
+}
+
 interface DataTableToolbarProps<TData> {
   table: TableType<TData>
+  filterColumns: FilterColumn[]
 }
 
 export function DataTableToolbar<TData>({
   table,
+  filterColumns = [],
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
 
   return (
     <div className='flex items-center justify-between'>
       <div className='flex flex-1 flex-col-reverse items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-2'>
-        <Input
-          placeholder='Filter by email...'
-          value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
-          onChange={(event) =>
-            table.getColumn('email')?.setFilterValue(event.target.value)
-          }
-          className='h-8 w-[150px] lg:w-[250px]'
-        />
+        {filterColumns.map((col) => (
+          <Input
+            key={col.id}
+            placeholder={col.placeholder}
+            value={(table.getColumn(col.id)?.getFilterValue() as string) ?? ''}
+            onChange={(event) =>
+              table.getColumn(col.id)?.setFilterValue(event.target.value)
+            }
+            className='h-8 w-[150px] lg:w-[250px]'
+          />
+        ))}
         <div className='flex gap-x-2'>
           {table.getColumn('status') && (
             <DataTableFacetedFilter

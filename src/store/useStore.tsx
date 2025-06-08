@@ -2,8 +2,29 @@ import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import type { Store, User } from './types'
 
+// Add cookie helpers at the top
+function setCookie(name: string, value: string, days = 7) {
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
+}
+function getCookie(name: string) {
+  return document.cookie.split('; ').reduce((r, v) => {
+    const parts = v.split('=');
+    return parts[0] === name ? decodeURIComponent(parts[1]) : r;
+  }, '');
+}
+function deleteCookie(name: string) {
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+}
+
+// Use cookie for currentUser persistence
+const savedUser = typeof window !== "undefined" ? (() => {
+  const val = getCookie("currentUser");
+  try { return val ? JSON.parse(val) : null; } catch { return null; }
+})() : null;
+
 const useStore = create<Store>((set, get) => ({
-  currentUser: null,
+  currentUser: savedUser,
   users: [],
   tasks: [],
   stock: [],
@@ -28,20 +49,22 @@ const useStore = create<Store>((set, get) => ({
         // console.log(profile,profileError)
 
       if (profile) {
+        setCookie("currentUser", JSON.stringify(profile));
         set({ currentUser: profile, loading: false })
         return true
       }
 
-      // If not found, check reservation_employees table
+      // If not found, check employees table
       const { data: reservationEmployee, error: employeeError } = await supabase
-        .from('reservation_employees')
+        .from('employees')
         .select('*')
         .eq('code', code)
         .single()
         console.log(reservationEmployee,employeeError)
 
       if (reservationEmployee) {
-        set({ currentUser: { ...reservationEmployee, role: 'reservation_employee' }, loading: false })
+        setCookie("currentUser", JSON.stringify({ ...reservationEmployee, role: 'employees' }));
+        set({ currentUser: { ...reservationEmployee, role: 'employees' }, loading: false })
         return true
       }
 
@@ -57,6 +80,7 @@ const useStore = create<Store>((set, get) => ({
   logout: async () => {
     set({ loading: true })
     try {
+      deleteCookie("currentUser");
       set({ currentUser: null, loading: false })
     } catch (error) {
       set({ error: (error as Error).message, loading: false })

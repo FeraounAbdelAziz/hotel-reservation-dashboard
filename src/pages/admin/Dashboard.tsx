@@ -17,7 +17,7 @@ function AdminDashboard() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data: employeesData } = await supabase.from('reservation_employees').select('*');
+      const { data: employeesData } = await supabase.from('employees').select('*');
       const { data: tasksData } = await supabase.from('tasks').select('*');
       const { data: stockData } = await supabase.from('stock').select('*');
 

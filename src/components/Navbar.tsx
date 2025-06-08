@@ -40,7 +40,7 @@ function Navbar() {
         return 'bg-blue-500/10 text-blue-500';
       case 'user':
         return 'bg-green-500/10 text-green-500';
-      case 'reservation_employee':
+      case 'employees':
         return 'bg-purple-500/10 text-purple-500';
       default:
         return 'bg-gray-500/10 text-gray-500';
