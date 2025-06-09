@@ -1,6 +1,4 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { Badge } from "@/components/ui/badge";
-import { DataTableColumnHeader } from "@/users/components/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import {
@@ -10,10 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { IconEdit } from "@tabler/icons-react";
-import LongText from "@/components/long-text";
-import { useState } from "react";
-import { supabase } from "@/lib/supabase";
-import { ConfirmDialog } from '@/components/confirm-dialog';
+
 
 export const reservationColumns: ColumnDef<any>[] = [
   {
@@ -58,7 +53,7 @@ export const reservationColumns: ColumnDef<any>[] = [
         ? `${row.original.changed_by.first_name} ${row.original.changed_by.last_name}`
         : '—',
     meta: { className: "w-40" },
-    filterFn: (row, id, value) => {
+    filterFn: (row, value) => {
       const changedBy = row.original.changed_by;
       if (!changedBy) return false;
       const fullName = `${changedBy.first_name} ${changedBy.last_name}`;

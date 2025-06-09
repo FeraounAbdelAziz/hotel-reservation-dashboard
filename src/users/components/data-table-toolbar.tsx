@@ -12,7 +12,7 @@ interface FilterColumn {
 
 interface DataTableToolbarProps<TData> {
   table: TableType<TData>
-  filterColumns: FilterColumn[]
+  filterColumns?: FilterColumn[]
 }
 
 export function DataTableToolbar<TData>({
