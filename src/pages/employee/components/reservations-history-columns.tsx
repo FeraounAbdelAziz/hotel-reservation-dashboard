@@ -18,9 +18,9 @@ export const reservationColumns: ColumnDef<any>[] = [
     meta: { className: "w-40" },
   },
   {
-    accessorKey: "reservation_id",
-    header: "Reservation ID",
-    cell: ({ row }) => row.original.reservation_id?.slice(0, 8) + "...",
+    accessorKey: "reservation_number",
+    header: "Reservation Number",
+    cell: ({ row }) => row.original.reservation_number || '-',
     meta: { className: "w-32" },
   },
   {

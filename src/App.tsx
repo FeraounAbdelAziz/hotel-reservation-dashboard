@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-route
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import Login from './pages/Login';
-import LandingPage from './pages/LandingPage';
 import AdminLayout from './pages/admin/Layout';
 import AdminDashboard from './pages/admin/Dashboard';
 import Users from './pages/admin/Users';
@@ -21,6 +20,7 @@ import AdminRooms from './pages/admin/Rooms';
 import ReservationEmployeeLayout from './layouts/ReservationEmployeeLayout';
 import ReservationEmployeeDashboard from './pages/employee/ReservationEmployeeDashboard';
 import ReservationHistoryEmployeeDashboard from './pages/employee/ReservationHistoryEmployeeDashboard';
+import {LandingPage} from './pages/landing/index';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -80,6 +80,7 @@ function App() {
               <Route index element={<AdminDashboard />} />
               <Route path="tasks" element={<div>Task Management</div>} />
               <Route path="rooms" element={<AdminRooms />} />
+              <Route path="reservation-history" element={<ReservationHistoryEmployeeDashboard />} />
               
               {/* Employee Management Routes */}
               <Route path="employees">
@@ -120,7 +121,6 @@ function App() {
               <Route path="reservations" element={<ReservationEmployeeDashboard />} />
               <Route path="reservation-list" element={<ReservationList />} />
               <Route path="rooms" element={<Rooms />} />
-              <Route path="reservation-history" element={<ReservationHistoryEmployeeDashboard />} />
             </Route>
           </Routes>
           <Toaster />

@@ -64,7 +64,7 @@ export function ReservationTable({ columns, data }: ReservationTableProps) {
       <DataTableToolbar 
         table={table} 
         filterColumns={[
-          { id: 'email', placeholder: 'Filter by email...' },
+          { id: 'chamber_number', placeholder: 'Filter by chamber number...' },
           { id: 'phone', placeholder: 'Filter by phone number...' },
         ]}
       />

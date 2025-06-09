@@ -14,6 +14,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useToast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { IconDotsVertical, IconEdit } from "@tabler/icons-react";
 
 const roomSchema = z.object({
   room_type: z.string().min(1, "Room type is required"),
@@ -36,6 +38,7 @@ export default function Rooms() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingRoom, setEditingRoom] = useState<Room | null>(null);
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -79,21 +82,56 @@ export default function Rooms() {
     return () => { isMounted = false; };
   }, []);
 
+  const handleEdit = (room: Room) => {
+    setEditingRoom(room);
+    form.reset({
+      room_type: room.room_type,
+      description: room.description,
+      guests: room.guests,
+      size_m2: room.size_m2,
+      beds: room.beds,
+      price_per_night: room.price_per_night,
+      rating: room.rating,
+      amenities: room.amenities.join(", "),
+      features: room.features.join(", "),
+      cancellation_policy: room.cancellation_policy,
+      image_urls: room.image_urls.join(", "),
+    });
+    setIsDialogOpen(true);
+  };
+
   const onSubmit = async (values: RoomFormValues) => {
     if (isSubmitting) return;
     setIsSubmitting(true);
     try {
-      const { error } = await supabase
-        .from("rooms")
-        .insert([{
-          ...values,
-          amenities: values.amenities.split(",").map(item => item.trim()),
-          features: values.features.split(",").map(item => item.trim()),
-          image_urls: values.image_urls.split(",").map(item => item.trim()),
-          created_at: new Date().toISOString(),
-        }]);
+      const roomData = {
+        ...values,
+        amenities: values.amenities.split(",").map(item => item.trim()),
+        features: values.features.split(",").map(item => item.trim()),
+        image_urls: values.image_urls.split(",").map(item => item.trim()),
+      };
 
-      if (error) throw error;
+      if (editingRoom) {
+        // Update existing room
+        const { error } = await supabase
+          .from("rooms")
+          .update(roomData)
+          .eq('id', editingRoom.id);
+
+        if (error) throw error;
+        toast({ title: "Success", description: "Room updated successfully." });
+      } else {
+        // Create new room
+        const { error } = await supabase
+          .from("rooms")
+          .insert([{
+            ...roomData,
+            created_at: new Date().toISOString(),
+          }]);
+
+        if (error) throw error;
+        toast({ title: "Success", description: "Room added successfully." });
+      }
 
       // Refresh rooms list
       const { data, error: fetchError } = await supabase
@@ -103,14 +141,44 @@ export default function Rooms() {
 
       if (!fetchError) setRooms(data || []);
       setIsDialogOpen(false);
+      setEditingRoom(null);
       form.reset();
-      toast({ title: "Success", description: "Room added successfully." });
     } catch (err) {
-      toast({ variant: "destructive", title: "Error", description: "Failed to add room." });
+      toast({ 
+        variant: "destructive", 
+        title: "Error", 
+        description: editingRoom ? "Failed to update room." : "Failed to add room." 
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // Patch columns to add edit handler
+  const columnsWithEdit = roomColumns.map(col => {
+    if (col.id === "actions") {
+      return {
+        ...col,
+        cell: ({ row }: any) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <IconDotsVertical className="h-4 w-4" />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleEdit(row.original)}>
+                <IconEdit className="mr-2 h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      };
+    }
+    return col;
+  });
 
   if (isLoading) {
     return (
@@ -136,11 +204,15 @@ export default function Rooms() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Hotel Rooms</CardTitle>
-          <Button onClick={() => setIsDialogOpen(true)}>Add Room</Button>
+          <Button onClick={() => {
+            setEditingRoom(null);
+            form.reset();
+            setIsDialogOpen(true);
+          }}>Add Room</Button>
         </CardHeader>
         <CardContent>
           {rooms.length > 0 ? (
-            <RoomsTable data={rooms} columns={roomColumns} />
+            <RoomsTable data={rooms} columns={columnsWithEdit} />
           ) : (
             <div className="text-center py-8 text-gray-500">
               No rooms found
@@ -152,7 +224,7 @@ export default function Rooms() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Add New Room</DialogTitle>
+            <DialogTitle>{editingRoom ? "Edit Room" : "Add New Room"}</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -284,7 +356,7 @@ export default function Rooms() {
                   <FormItem>
                     <FormLabel>Cancellation Policy</FormLabel>
                     <FormControl>
-                      <Textarea {...field} />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -304,11 +376,14 @@ export default function Rooms() {
                 )}
               />
               <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                <Button type="button" variant="outline" onClick={() => {
+                  setIsDialogOpen(false);
+                  setEditingRoom(null);
+                }}>
                   Cancel
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Adding..." : "Add Room"}
+                  {isSubmitting ? "Saving..." : editingRoom ? "Save Changes" : "Add Room"}
                 </Button>
               </div>
             </form>

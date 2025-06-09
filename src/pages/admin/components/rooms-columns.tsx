@@ -1,5 +1,13 @@
 import { type ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
+import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { IconEdit } from "@tabler/icons-react";
 
 export interface Room {
   id: string;
@@ -96,14 +104,29 @@ export const roomColumns: ColumnDef<Room>[] = [
   },
   {
     id: "actions",
-    cell: ({ }) => {
+    cell: ({ row }) => {
       return (
-        <Button variant="ghost" size="icon">
-          <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path d="M15.232 5.232l3.536 3.536M9 11l6 6M3 21h6l11.293-11.293a1 1 0 0 0 0-1.414l-3.586-3.586a1 1 0 0 0-1.414 0L3 15v6z"/>
-          </svg>
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <DotsHorizontalIcon className="h-4 w-4" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              onClick={() => {
+                // TODO: Implement edit functionality
+                console.log("Edit room:", row.original);
+              }}
+            >
+              <IconEdit className="mr-2 h-4 w-4" />
+              Edit
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       );
     },
+    meta: { className: "w-12" },
   },
 ]; 

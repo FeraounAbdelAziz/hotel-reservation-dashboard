@@ -13,6 +13,7 @@ import * as z from "zod";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import useStore from '@/store/useStore';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Reservation {
   id: string;
@@ -43,6 +44,7 @@ export default function ReservationEmployeeDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
+  const [roomTypes, setRoomTypes] = useState<string[]>([]);
   const { toast } = useToast();
   const currentUser = useStore(state => state.currentUser);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -56,6 +58,29 @@ export default function ReservationEmployeeDashboard() {
       special_requests: "",
     },
   });
+
+  useEffect(() => {
+    fetchRoomTypes();
+  }, []);
+
+  const fetchRoomTypes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('rooms')
+        .select('room_type')
+        .order('room_type');
+
+      if (error) throw error;
+      setRoomTypes(data.map(room => room.room_type));
+    } catch (err) {
+      console.error('Error fetching room types:', err);
+      toast({
+        title: "Error",
+        description: "Failed to fetch room types",
+        variant: "destructive",
+      });
+    }
+  };
 
   useEffect(() => {
     if (editingReservation) {
@@ -268,9 +293,20 @@ export default function ReservationEmployeeDashboard() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Room Type</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a room type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {roomTypes.map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

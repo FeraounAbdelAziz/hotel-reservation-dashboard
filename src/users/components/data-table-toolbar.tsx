@@ -36,9 +36,9 @@ export function DataTableToolbar<TData>({
           />
         ))}
         <div className='flex gap-x-2'>
-          {table.getColumn('status') && (
+          {table.getAllColumns().find((column) => column.id === 'status') && (
             <DataTableFacetedFilter
-              column={table.getColumn('status')}
+              column={table.getColumn('status')!}
               title='Status'
               options={[
                 { label: 'Active', value: 'active' },

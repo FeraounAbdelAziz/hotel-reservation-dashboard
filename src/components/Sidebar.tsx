@@ -1,5 +1,5 @@
-import { Link, useLocation } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import { Link, useLocation } from "react-router-dom";
+import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   Users,
@@ -11,21 +11,31 @@ import {
   FileText,
   LogOut,
   User2,
-} from 'lucide-react';
-import useStore from '@/store/useStore';
-import { useState } from 'react';
+  HomeIcon,
+} from "lucide-react";
+import useStore from "@/store/useStore";
+import { useState } from "react";
 
 const employeeLinks = [
-  { name: 'Reservations', href: '/admin/employees/reservations', icon: CalendarDays },
-  { name: 'Maintenance', href: '/admin/employees/maintenance', icon: Wrench },
-  { name: 'Stock', href: '/admin/employees/stock', icon: Package },
-  { name: 'Reports', href: '/admin/employees/reports', icon: FileText },
-  { name: 'Facilities', href: '/admin/employees/facilities', icon: Building2 },
+  {
+    name: "Reservations",
+    href: "/admin/employees/reservations",
+    icon: CalendarDays,
+  },
+  { name: "Maintenance", href: "/admin/employees/maintenance", icon: Wrench },
+  { name: "Stock", href: "/admin/employees/stock", icon: Package },
+  { name: "Reports", href: "/admin/employees/reports", icon: FileText },
+  { name: "Facilities", href: "/admin/employees/facilities", icon: Building2 },
 ];
 
 const mainNavItems = [
-  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-  { name: 'Rooms', href: '/admin/rooms', icon: User2 },
+  { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { name: "Rooms", href: "/admin/rooms", icon: User2 },
+  {
+    name: "reservation history",
+    href: "/admin/reservation-history",
+    icon: HomeIcon,
+  },
 ];
 
 export function Sidebar() {
@@ -34,7 +44,7 @@ export function Sidebar() {
   const [isEmployeesOpen, setIsEmployeesOpen] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
-  const isEmployeesActive = employeeLinks.some(link => isActive(link.href));
+  const isEmployeesActive = employeeLinks.some((link) => isActive(link.href));
 
   return (
     <div className="flex h-screen w-64 flex-col border-r bg-background">
@@ -49,7 +59,7 @@ export function Sidebar() {
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
               isActive(item.href)
-                ? "bg-primary text-primary-foreground" 
+                ? "bg-primary text-primary-foreground"
                 : "hover:bg-accent hover:text-accent-foreground"
             )}
           >
@@ -65,7 +75,7 @@ export function Sidebar() {
             className={cn(
               "flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors",
               isEmployeesActive
-                ? "bg-primary text-primary-foreground" 
+                ? "bg-primary text-primary-foreground"
                 : "hover:bg-accent hover:text-accent-foreground"
             )}
           >
@@ -73,12 +83,14 @@ export function Sidebar() {
               <Users className="h-4 w-4" />
               <span>Employees</span>
             </div>
-            <ChevronDown className={cn(
-              "h-4 w-4 transition-transform",
-              isEmployeesOpen ? "rotate-180" : ""
-            )} />
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 transition-transform",
+                isEmployeesOpen ? "rotate-180" : ""
+              )}
+            />
           </button>
-          
+
           {isEmployeesOpen && (
             <div className="ml-4 space-y-1">
               {employeeLinks.map((link) => (
@@ -88,7 +100,7 @@ export function Sidebar() {
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
                     isActive(link.href)
-                      ? "bg-primary/20 text-primary-foreground" 
+                      ? "bg-primary/20 text-primary-foreground"
                       : "hover:bg-accent hover:text-accent-foreground"
                   )}
                 >
@@ -111,4 +123,4 @@ export function Sidebar() {
       </div>
     </div>
   );
-} 
+}

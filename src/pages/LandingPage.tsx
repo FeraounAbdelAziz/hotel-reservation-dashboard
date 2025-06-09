@@ -113,6 +113,7 @@ export default function LandingPage() {
     setIsLoading(true);
 
     try {
+      // First create the reservation
       const { error: reservationError } = await supabase
         .from("reservations")
         .insert({
@@ -126,15 +127,82 @@ export default function LandingPage() {
           guests: parseInt(formData.guests),
           special_requests: specialRequests || null,
           status: "pending",
-        })
-        .select();
+          chamber_number: "not assigned" // Default value
+        });
 
       if (reservationError) {
         toast.error(reservationError.message);
         return;
       }
 
-      toast.success("Reservation submitted successfully!");
+      // Then try to find an available chamber
+      const { data: availableChambers, error: chamberError } = await supabase
+        .from('room_chambers')
+        .select('id, chamber_number, room_type, status')
+        .eq('status', 'available')
+        .eq('room_type', roomType)
+        .limit(1);
+
+      console.log('Available Chambers:', availableChambers);
+      console.log('Chamber Error:', chamberError);
+      console.log('Searching for room type:', roomType);
+
+      // If we found an available chamber, update both the reservation and chamber
+      if (availableChambers && availableChambers.length > 0) {
+        const availableChamber = availableChambers[0];
+        console.log('Selected Chamber:', availableChamber);
+        
+        // Update reservation with chamber details
+        const { error: updateReservationError } = await supabase
+          .from("reservations")
+          .update({
+            chamber_id: availableChamber.id,
+            chamber_number: availableChamber.chamber_number,
+            status: "pending"
+          })
+          .eq('email', email)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (updateReservationError) {
+          console.error('Error updating reservation:', updateReservationError);
+          toast.error('Error assigning room');
+          return;
+        }
+
+        // Update chamber status
+        const { error: updateChamberError } = await supabase
+          .from('room_chambers')
+          .update({ status: 'reserved' })
+          .eq('id', availableChamber.id);
+
+        if (updateChamberError) {
+          console.error('Error updating chamber status:', updateChamberError);
+          toast.error('Error updating room status');
+          return;
+        }
+
+        toast.success(`Reservation submitted successfully! Assigned to Room ${availableChamber.chamber_number}`);
+      } else {
+        // No available rooms, update reservation status to not assigned
+        const { error: updateReservationError } = await supabase
+          .from("reservations")
+          .update({
+            status: "not assigned",
+            chamber_number: "not assigned"
+          })
+          .eq('email', email)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (updateReservationError) {
+          console.error('Error updating reservation status:', updateReservationError);
+          toast.error('Error updating reservation status');
+          return;
+        }
+
+        toast.success("Reservation submitted successfully! No rooms available at the moment. We'll notify you when a room becomes available.");
+      }
 
       // Reset form
       setFormData({
@@ -446,75 +514,7 @@ export default function LandingPage() {
             Our Rooms
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              ...rooms,
-              {
-                id: "family",
-                name: "Family Suite",
-                price: 220,
-                description:
-                  "Perfect for families with spacious rooms and kid-friendly amenities",
-                size: "45 m²",
-                maxGuests: 4,
-                bedType: "King Bed + 2 Twin Beds",
-                images: [
-                  "https://images.unsplash.com/photo-1590490359683-658d3d23f972?w=1200&auto=format&fit=crop&q=80",
-                  "https://images.unsplash.com/photo-1591085686350-798c0f9faa7f?w=1200&auto=format&fit=crop&q=80",
-                ],
-                amenities: [
-                  { icon: "wifi" as const, name: "Family WiFi" },
-                  { icon: "tv" as const, name: "Smart TV" },
-                  { icon: "coffee" as const, name: "Coffee Maker" },
-                  { icon: "bath" as const, name: "Family Bathroom" },
-                  { icon: "airVent" as const, name: "Air Conditioning" },
-                  { icon: "utensils" as const, name: "Room Service" },
-                ],
-                features: [
-                  "Connected rooms option",
-                  "Kids play area",
-                  "Family dining table",
-                  "Child safety features",
-                  "Extra storage space",
-                  "Blackout curtains",
-                ],
-                longDescription:
-                  "Our Family Suite is designed with families in mind, offering spacious accommodations and thoughtful amenities. The suite features a king bed for parents and two twin beds for children, along with a family-friendly bathroom. Enjoy the convenience of a dining area, extra storage space, and child safety features throughout. The connected rooms option allows for even more space when needed.",
-              },
-              {
-                id: "honeymoon",
-                name: "Honeymoon Suite",
-                price: 350,
-                description:
-                  "Romantic retreat with premium amenities and special touches",
-                size: "55 m²",
-                maxGuests: 2,
-                bedType: "King Bed",
-                images: [
-                  "https://images.unsplash.com/photo-1591085686350-798c0f9faa7f?w=1200&auto=format&fit=crop&q=80",
-                  "https://images.unsplash.com/photo-1590490359683-658d3d23f972?w=1200&auto=format&fit=crop&q=80",
-                ],
-                amenities: [
-                  { icon: "wifi" as const, name: "Premium WiFi" },
-                  { icon: "tv" as const, name: "Smart TV" },
-                  { icon: "coffee" as const, name: "Espresso Bar" },
-                  { icon: "bath" as const, name: "Jacuzzi Bath" },
-                  { icon: "airVent" as const, name: "Smart Climate" },
-                  { icon: "utensils" as const, name: "Romantic Dining" },
-                ],
-                features: [
-                  "Private balcony",
-                  "King-size canopy bed",
-                  "Jacuzzi bathroom",
-                  "Romantic dining area",
-                  "Champagne service",
-                  "Premium minibar",
-                  "Special turndown service",
-                  "Rose petal decoration",
-                ],
-                longDescription:
-                  "Experience romance and luxury in our Honeymoon Suite. This intimate retreat features a king-size canopy bed, private balcony, and a luxurious jacuzzi bathroom. Enjoy special touches like champagne service, romantic dining options, and premium amenities. The suite is designed for couples seeking a memorable and romantic getaway.",
-              },
-            ].map((room) => (
+            {rooms.map((room) => (
               <div
                 key={room.id}
                 className="group relative overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-500 hover:shadow-2xl hover:-translate-y-1"

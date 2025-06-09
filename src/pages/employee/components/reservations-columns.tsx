@@ -169,6 +169,14 @@ export const reservationColumns: ColumnDef<any>[] = [
     meta: { className: "w-16" },
   },
   {
+    accessorKey: "chamber_number",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Chamber" />
+    ),
+    cell: ({ row }) => row.getValue("chamber_number") || "Not Assigned",
+    meta: { className: "w-24" },
+  },
+  {
     accessorKey: "special_requests",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Special Requests" />

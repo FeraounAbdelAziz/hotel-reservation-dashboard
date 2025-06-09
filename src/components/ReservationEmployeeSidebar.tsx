@@ -9,13 +9,13 @@ export default function ReservationEmployeeSidebar() {
 
   const navigation = [
     { name: "Dashboard", href: "/employee", icon: HomeIcon },
+    { name: "Rooms", href: "/employee/rooms", icon: HomeIcon },
+
     {
       name: "Reservations",
       href: "/employee/reservations",
       icon: CalendarDaysIcon,
     },
-    { name: "Rooms", href: "/employee/rooms", icon: HomeIcon },
-    { name: "reservation history", href: "/employee/reservation-history", icon: HomeIcon },
   ];
 
   const handleLogout = async () => {

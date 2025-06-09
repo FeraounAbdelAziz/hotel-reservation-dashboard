@@ -34,7 +34,6 @@ export default function ReservationHistoryEmployeeDashboard() {
                 )
             `
           )
-          .eq("changed_by", userID)
           .order("changed_at", { ascending: false });
 
           console.log(data,error);

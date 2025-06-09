@@ -20,7 +20,7 @@ export interface Room {
 // Using high-quality placeholder images from Unsplash
 export const rooms: Room[] = [
   {
-    id: "standard",
+    id: "Standard Room",
     name: "Standard Room",
     price: 120,
     description: "Comfortable room with modern amenities",
@@ -51,7 +51,7 @@ export const rooms: Room[] = [
     longDescription: "Our Standard Room offers a perfect blend of comfort and functionality. Featuring a queen-size bed with premium bedding, a modern workspace, and a private bathroom with rain shower. The room is designed with warm wooden accents and natural lighting, creating a cozy atmosphere for your stay."
   },
   {
-    id: "deluxe",
+    id: "Deluxe Room",
     name: "Deluxe Room",
     price: 180,
     description: "Spacious room with premium features",
@@ -82,7 +82,7 @@ export const rooms: Room[] = [
     longDescription: "The Deluxe Room offers an elevated experience with its spacious layout and premium amenities. Enjoy the comfort of a king-size bed and an additional sofa bed, perfect for families or small groups. The room features elegant wooden furnishings, floor-to-ceiling windows with city views, and a luxurious bathroom with a rain shower."
   },
   {
-    id: "suite",
+    id: "Executive Suite",
     name: "Executive Suite",
     price: 280,
     description: "Luxurious suite with separate living area",
@@ -113,7 +113,7 @@ export const rooms: Room[] = [
     longDescription: "The Executive Suite offers the perfect blend of luxury and functionality. This spacious suite features a separate living area with a dining table, a king-size bedroom, and a luxurious bathroom with a jacuzzi. The suite is adorned with premium wooden finishes, designer furniture, and offers stunning city views from its private balcony."
   },
   {
-    id: "presidential",
+    id: "Presidential Suite",
     name: "Presidential Suite",
     price: 500,
     description: "Ultimate luxury with panoramic views and exclusive amenities",
